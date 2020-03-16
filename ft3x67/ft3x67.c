@@ -39,8 +39,7 @@
 #include "ft3x67.h"
 #include "stm32l4xx_hal.h"
 #include "stm32l4r9xx.h"
-#include "stm32l4r9i_discovery.h"
-#include "stm32l4r9i_discovery_io.h"
+#include "stm32l4r9i_eval.h"
 
 /** @addtogroup BSP
   * @{
@@ -217,20 +216,17 @@ static void raydium_hw_reset(void);
   */
 void ft3x67_Init(uint16_t DeviceAddr)
 {
-	  GPIO_InitTypeDef gpio_init_structure;
-//  __HAL_RCC_GPIOB_CLK_ENABLE();
-	  TS_RES_GPIO_CLK_ENABLE();
-  TS_INT_GPIO_CLK_ENABLE();
+  GPIO_InitTypeDef gpio_init_structure;
+
+  TS_DSI_RES_GPIO_CLK_ENABLE();
+  TS_DSI_INT_GPIO_CLK_ENABLE();
 
   // Config Reset pin
-//  BSP_IO_Init();
-//  BSP_IO_ConfigPin(TS_RES_PIN, IO_MODE_OUTPUT);
-
-    gpio_init_structure.Pin = GPIO_PIN_13;
-    gpio_init_structure.Pull = GPIO_PULLUP;
-    gpio_init_structure.Speed = GPIO_SPEED_FAST;
-    gpio_init_structure.Mode = GPIO_MODE_OUTPUT_PP;
-    HAL_GPIO_Init(GPIOB, &gpio_init_structure);
+  gpio_init_structure.Pin = TS_DSI_RES_PIN;
+  gpio_init_structure.Pull = GPIO_PULLUP;
+  gpio_init_structure.Speed = GPIO_SPEED_FAST;
+  gpio_init_structure.Mode = GPIO_MODE_OUTPUT_PP;
+  HAL_GPIO_Init(TS_DSI_RES_GPIO_PORT, &gpio_init_structure);
 
   // Reset the touch sensor
   raydium_hw_reset();
@@ -460,16 +456,14 @@ void ft3x67_TS_EnableIT(uint16_t DeviceAddr)
 {
   /* Set interrupt trigger mode in FT3X67_GMODE_REG */
   //TS_IO_Write(DeviceAddr, FT3X67_GMODE_REG, FT3X67_G_MODE_INTERRUPT_TRIGGER);
-//	 BSP_IO_Init();
-	GPIO_InitTypeDef gpio_init_structure;
+  GPIO_InitTypeDef gpio_init_structure;
+
   /* Configure Interrupt mode for TS detection pin */
-  gpio_init_structure.Pin = TS_INT_PIN;
+  gpio_init_structure.Pin = TS_DSI_INT_PIN;
   gpio_init_structure.Pull = GPIO_PULLUP;
   gpio_init_structure.Speed = GPIO_SPEED_HIGH;
   gpio_init_structure.Mode = GPIO_MODE_IT_FALLING;
-  HAL_GPIO_Init(TS_INT_GPIO_PORT, &gpio_init_structure);
-//  BSP_IO_ConfigPin(TS_INT_PIN, IO_MODE_IT_FALLING_EDGE_PU);
-
+  HAL_GPIO_Init(TS_DSI_INT_GPIO_PORT, &gpio_init_structure);
 }
 
 /**
@@ -485,12 +479,11 @@ void ft3x67_TS_DisableIT(uint16_t DeviceAddr)
   GPIO_InitTypeDef gpio_init_structure;
 
   /* Configure Interrupt mode for TS detection pin */
-  gpio_init_structure.Pin = TS_INT_PIN;
+  gpio_init_structure.Pin = TS_DSI_INT_PIN;
   gpio_init_structure.Pull = GPIO_PULLUP;
   gpio_init_structure.Speed = GPIO_SPEED_HIGH;
   gpio_init_structure.Mode = GPIO_MODE_INPUT;
-  HAL_GPIO_Init(TS_INT_GPIO_PORT, &gpio_init_structure);
-//  BSP_IO_ConfigPin(TS_INT_PIN, IO_MODE_INPUT);
+  HAL_GPIO_Init(TS_DSI_INT_GPIO_PORT, &gpio_init_structure);
 }
 
 /**
@@ -809,14 +802,10 @@ static void raydium_pda_write(uint32_t addr, uint8_t *w_data, uint16_t length)
 
 static void raydium_hw_reset(void)
 {
-	 HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
-	  HAL_Delay(10);
-	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_SET);
-	  HAL_Delay(400);
-//BSP_IO_WritePin(TS_RES_PIN, GPIO_PIN_RESET);
-//  HAL_Delay(10);
-//  BSP_IO_WritePin(TS_RES_PIN, GPIO_PIN_SET);
-//  HAL_Delay(400);
+  HAL_GPIO_WritePin(TS_DSI_RES_GPIO_PORT, TS_DSI_RES_PIN, GPIO_PIN_RESET);
+  HAL_Delay(10);
+  HAL_GPIO_WritePin(TS_DSI_RES_GPIO_PORT, TS_DSI_RES_PIN, GPIO_PIN_SET);
+  HAL_Delay(400);
 }
 
 static void raydium_pda2_set_page(uint8_t page)
