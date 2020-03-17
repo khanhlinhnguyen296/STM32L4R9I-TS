@@ -48,7 +48,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32l4r9i_discovery_ts.h"
 #include "math.h"
-#include "log.h"
 
 /** @addtogroup BSP
   * @{
@@ -103,7 +102,6 @@ uint8_t BSP_TS_Init(uint16_t ts_SizeX, uint16_t ts_SizeY)
 
     /* Calibrate, Configure and Start the TouchScreen driver */
     tsDriver->Start(I2C_Address);
-
     HwRotation = 1;
     /* Read firmware register to know if HW rotation is implemented */
 //    if(TS_IO_Read(I2C_Address, FT3X67_FIRMID_REG) != 0x01)
@@ -223,7 +221,6 @@ uint8_t BSP_TS_GestureConfig(FunctionalState State)
 {
   uint8_t  ts_status = TS_OK;
   uint32_t Activation;
-  log_debug("gestureconfig\r\n");
 
   /* Configure gesture feature */
   Activation = (State == ENABLE) ? FT3X67_GESTURE_ENABLE : FT3X67_GESTURE_DISABLE;
@@ -244,7 +241,7 @@ uint8_t BSP_TS_Get_GestureId(TS_StateTypeDef *TS_State)
 
   /* Get gesture Id */
   ft3x67_TS_GetGestureID(I2C_Address, &gestureId);
-  log_debug("IDgesture\r\n");
+
   /* Remap gesture Id to a TS_GestureIdTypeDef value */
   switch(gestureId)
   {
@@ -314,21 +311,18 @@ uint8_t BSP_TS_ITConfig(void)
   /* Enable the TS ITs */
   tsDriver->EnableIT(I2C_Address);
   GPIO_InitTypeDef gpio_init_structure;
- // BSP_IO_ConfigPin(TS_INT_PIN, IO_MODE_IT_FALLING_EDGE);
-    /* Configure Interrupt mode for TS detection pin */
-    gpio_init_structure.Pin = TS_INT_PIN;
-    gpio_init_structure.Pull = GPIO_PULLUP;
-    gpio_init_structure.Speed = GPIO_SPEED_FAST;
-    gpio_init_structure.Mode = GPIO_MODE_IT_FALLING;
-    HAL_GPIO_Init(TS_INT_GPIO_PORT, &gpio_init_structure);
-
-    /* Enable and set Touch screen EXTI Interrupt to the lowest priority */
-    HAL_NVIC_SetPriority((IRQn_Type)(TS_INT_EXTI_IRQn), 0x0F, 0x00);
-    HAL_NVIC_EnableIRQ((IRQn_Type)(TS_INT_EXTI_IRQn));
-
+  gpio_init_structure.Pin = TS_INT_PIN;
+  gpio_init_structure.Pull = GPIO_PULLUP;
+  gpio_init_structure.Speed = GPIO_SPEED_FAST;
+  gpio_init_structure.Mode = GPIO_MODE_IT_FALLING;
+  HAL_GPIO_Init(TS_INT_GPIO_PORT, &gpio_init_structure);
+  /* Configure touchscreen interrupt pin */
+  //BSP_IO_ConfigPin(TS_INT_PIN, IO_MODE_IT_FALLING_EDGE_PU);
   /* Configure IO Expander interrupt */
- // MFX_IO_ITConfig();
-    log_debug("hello\r\n");
+//  MFX_IO_ITConfig();
+  /* Enable and set Touch Screen EXTI Interrupt to the lowest priority*/
+  HAL_NVIC_SetPriority((IRQn_Type)(TS_INT_EXTI_IRQn), 0x0F, 0x00);
+  HAL_NVIC_EnableIRQ((IRQn_Type)(TS_INT_EXTI_IRQn));
   return TS_OK;
 }
 
@@ -339,15 +333,13 @@ uint8_t BSP_TS_ITConfig(void)
 uint8_t BSP_TS_ITDisable(void)
 {
   /* Configure touchscreen interrupt pin */
-//	  GPIO_InitTypeDef gpio_init_structure;
-//
-//	gpio_init_structure.Pin = TS_INT_PIN;
-//	    gpio_init_structure.Pull = GPIO_PULLUP;
-//	    gpio_init_structure.Speed = GPIO_SPEED_FAST;
-//	    gpio_init_structure.Mode = GPIO_MODE_ANALOG;
-//	    HAL_GPIO_Init(TS_INT_GPIO_PORT, &gpio_init_structure);
- BSP_IO_ConfigPin(TS_INT_PIN, IO_MODE_ANALOG);
-
+//  BSP_IO_ConfigPin(TS_INT_PIN, IO_MODE_ANALOG);
+	 GPIO_InitTypeDef gpio_init_structure;
+	  gpio_init_structure.Pin = TS_INT_PIN;
+	  gpio_init_structure.Pull = GPIO_PULLUP;
+	  gpio_init_structure.Speed = GPIO_SPEED_FAST;
+	  gpio_init_structure.Mode = GPIO_MODE_ANALOG;
+	  HAL_GPIO_Init(TS_INT_GPIO_PORT, &gpio_init_structure);
   /* Disable the TS ITs */
   tsDriver->DisableIT(I2C_Address);
 

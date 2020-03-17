@@ -20,7 +20,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stlogo.h"
-#include "log.h"
 
 /** @addtogroup STM32L4xx_HAL_Examples
   * @{
@@ -100,7 +99,7 @@ static void Display_DemoDescription(void);
 
 BSP_DemoTypedef  BSP_examples[]=
 {
-//  {Joystick_demo, "JOYSTICK", 0},
+ // {Joystick_demo, "JOYSTICK", 0},
  // {Led_demo, "LED", 0},
   {LCD_demo, "LCD", 0},
 //   {Idd_demo, "IDD", 0},
@@ -336,7 +335,6 @@ void SystemClock_ConfigFromLowPower(void)
   */
 void SystemHardwareInit(void)
 {
-	log_init();
   /* Init LED 1 to 4  */
   if(LedInitialized != SET)
   {
@@ -554,7 +552,6 @@ void Convert_IntegerIntoChar(uint32_t number, uint16_t *p_tab)
   */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-	log_debug("inter here\r\n");
   /* Check if interrupt comes from MFX */
   if(GPIO_Pin == MFX_INT_PIN)
   {
@@ -579,23 +576,21 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
       }
       else
       {
-
         /* Pause playing Wave status */
         PauseResumeStatus = PAUSE_STATUS;
         PressCount = 1;
       }
     }
   }
-  else if(TS_INT_PIN)
+  else if (TS_INT_PIN)
   {
-	  HAL_NVIC_DisableIRQ(EXTI15_10_IRQn);
-	  log_debug("into the callback\r\n");
-	      MfxItOccurred = SET;
-	      TouchEvent=1;
+	  HAL_NVIC_DisableIRQ(TS_INT_EXTI_IRQn);
+	  MfxItOccurred = SET;
+	  TouchEvent=1;
   }
   else
   {
-
+    /* Unexpected case */
   }
 }
 
@@ -618,9 +613,9 @@ void Mfx_Event(void)
   if(irqPending & MFX_IRQ_PENDING_GPIO)
   {
     uint32_t JoystickStatus;
-    uint32_t statusGpio = BSP_IO_ITGetStatus(RIGHT_JOY_PIN | LEFT_JOY_PIN | UP_JOY_PIN | DOWN_JOY_PIN | SD_DETECT_PIN);
+    uint32_t statusGpio = BSP_IO_ITGetStatus(RIGHT_JOY_PIN | LEFT_JOY_PIN | UP_JOY_PIN | DOWN_JOY_PIN |  SD_DETECT_PIN);
 
-   // TouchEvent =  statusGpio & TS_INT_PIN;
+    TouchEvent =  statusGpio & TS_INT_PIN;
 
     JoystickStatus = statusGpio & (RIGHT_JOY_PIN | LEFT_JOY_PIN | UP_JOY_PIN | DOWN_JOY_PIN);
 

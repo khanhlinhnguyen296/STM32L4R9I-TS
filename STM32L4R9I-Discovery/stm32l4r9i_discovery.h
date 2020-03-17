@@ -315,20 +315,17 @@ typedef enum
 #define LCD_BL_CTRL_GPIO_CLK_DISABLE()   __HAL_RCC_GPIOB_CLK_DISABLE()
 
 /* TS INT pin */
-#define TS_INT_PIN                  GPIO_PIN_15
-#define TS_INT_EXTI_IRQn             EXTI15_10_IRQn
+#define TS_INT_PIN                       GPIO_PIN_15
+#define TS_INT_EXTI_IRQn                 EXTI15_10_IRQn
 #define TS_INT_GPIO_PORT            GPIOB
 #define TS_INT_GPIO_CLK_ENABLE()    __HAL_RCC_GPIOB_CLK_ENABLE()
 #define TS_INT_GPIO_CLK_DISABLE()   __HAL_RCC_GPIOB_CLK_DISABLE()
 
-
-
-/*TS RES PIN*/
-#define TS_RES_PIN                  GPIO_PIN_13
+/* TS RES INT pin */
+#define TS_RES_PIN                       GPIO_PIN_9
 #define TS_RES_GPIO_PORT            GPIOB
 #define TS_RES_GPIO_CLK_ENABLE()    __HAL_RCC_GPIOB_CLK_ENABLE()
 #define TS_RES_GPIO_CLK_DISABLE()   __HAL_RCC_GPIOB_CLK_DISABLE()
-
 
 /**
   * @}

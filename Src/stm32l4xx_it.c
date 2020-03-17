@@ -20,7 +20,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32l4xx_it.h"
-#include "log.h"
 
 /** @addtogroup STM32L4xx_HAL_Examples
   * @{
@@ -189,20 +188,14 @@ void EXTI1_IRQHandler(void)
   if (screen_back_on == 1)
   {
     __HAL_GPIO_EXTI_CLEAR_IT(MFX_INT_PIN);
-
-  //  HAL_NVIC_DisableIRQ(TS_INT_EXTI_IRQn);
-
     HAL_NVIC_DisableIRQ(MFX_INT_EXTI_IRQn);
-
     Mfx_Event();
     HAL_NVIC_EnableIRQ(MFX_INT_EXTI_IRQn);
- //   HAL_NVIC_EnableIRQ(TS_INT_EXTI_IRQn);
   }
   else
 #endif /* defined(LCD_DIMMING) */
 
   HAL_GPIO_EXTI_IRQHandler(MFX_INT_PIN);
-
 }
 
 /**
@@ -212,15 +205,6 @@ void EXTI1_IRQHandler(void)
   */
 void EXTI15_10_IRQHandler(void)
 {
-
-//if(__HAL_GPIO_EXTI_GET_IT(GPIO_PIN_15)!=RESET)
-//{
-//
-//	log_debug("touch interrupt\r\n");
-//	}
-//__HAL_GPIO_EXTI_CLEAR_IT(TS_INT_PIN);
-//HAL_GPIO_EXTI_Callback(TS_INT_PIN);
-HAL_GPIO_EXTI_IRQHandler(TS_INT_PIN);
 #if defined(LCD_DIMMING)
   if (display_dimmed == 1)
   {
@@ -243,6 +227,7 @@ HAL_GPIO_EXTI_IRQHandler(TS_INT_PIN);
 #endif /* defined(LCD_DIMMING) */
 
   HAL_GPIO_EXTI_IRQHandler(SEL_JOY_PIN);
+  HAL_GPIO_EXTI_IRQHandler(TS_INT_PIN);
 }
 
 /**

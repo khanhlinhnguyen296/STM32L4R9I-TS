@@ -19,7 +19,6 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "log.h"
 
 /** @addtogroup STM32L4xx_HAL_Examples
   * @{
@@ -72,30 +71,30 @@ void Touchscreen_demo (void)
       /* if touch occurred                                                        */
       if(MfxItOccurred == SET)
       {
-      //  Mfx_Event();
-        log_debug("here");
+     //   Mfx_Event();
+        
         if(TouchEvent != 0)
-       {
+        {
           BSP_TS_GetState(&TS_State);
           if(TS_State.touchDetected)
           {
             /* Get X and Y position of the touch post calibrated */
             x = TS_State.touchX[0];
             y = TS_State.touchY[0];
-
+            
             while(BSP_LCD_IsFrameBufferAvailable() != LCD_OK);
-
+            
             BSP_LCD_SetBackColor(LCD_COLOR_WHITE);
             BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
             sprintf((char*)text, "Nb touch detected = %d", TS_State.touchDetected);
             BSP_LCD_ClearStringLine(19);
             BSP_LCD_DisplayStringAtLine(19, (uint8_t *)&text);
-
+            
             /* Display 1st touch detected coordinates */
             sprintf((char*)text, "1[%d,%d], ev = %d", x, y, TS_State.touchEventId[0]);
             BSP_LCD_ClearStringLine(20);
             BSP_LCD_DisplayStringAtLine(20, (uint8_t *)&text);
-
+            
             if (TS_State.touchDetected >= 2)  /* Display 2nd touch detected coordinates if applicable */
             {
               sprintf((char*)text, "2[%d,%d], ev = %d", TS_State.touchX[1], TS_State.touchY[1], TS_State.touchEventId[1]);
@@ -106,14 +105,14 @@ void Touchscreen_demo (void)
             }
             BSP_LCD_ClearStringLine(21);
             BSP_LCD_DisplayStringAtLine(21, (uint8_t *)&text);
-
+            
             /* Weight not supported so radius maximum */
             radius = CIRCLE_RADIUS;
-
+            
             if ((y > (CIRCLE_YPOS(1) - CIRCLE_RADIUS)) &&
                 (y < (CIRCLE_YPOS(1) + CIRCLE_RADIUS)))
             {
-
+              
               if ((x > (CIRCLE_XPOS(1) - CIRCLE_RADIUS)) &&
                   (x < (CIRCLE_XPOS(1) + CIRCLE_RADIUS)))
               {
@@ -144,7 +143,7 @@ void Touchscreen_demo (void)
                   state = 2;
                 }
               }
-
+              
               if ((x > (CIRCLE_XPOS(3) - CIRCLE_RADIUS)) &&
                   (x < (CIRCLE_XPOS(3) + CIRCLE_RADIUS)))
               {
@@ -160,7 +159,7 @@ void Touchscreen_demo (void)
                   state = 4;
                 }
               }
-
+              
               if ((x > (CIRCLE_XPOS(4) - CIRCLE_RADIUS)) &&
                   (x < (CIRCLE_XPOS(4) + CIRCLE_RADIUS)))
               {
@@ -177,10 +176,10 @@ void Touchscreen_demo (void)
                 }
               }
             }
-
+            
             BSP_LCD_Refresh();
           } /* if(TS_State.touchDetected) */
-      //    TouchEvent = 0;
+         // TouchEvent = 0;
         } /* if(TouchEvent != 0) */
         else if(JoyState == JOY_RIGHT)
         {
@@ -189,7 +188,7 @@ void Touchscreen_demo (void)
           BSP_TS_GestureConfig(ENABLE);
           Touchscreen_SetHint();
         }
-     } /* if(MfxItOccurred == SET) */
+      } /* if(MfxItOccurred == SET) */
     }
     else /* Gesture Test */
     {
@@ -198,11 +197,11 @@ void Touchscreen_demo (void)
       if(MfxItOccurred == SET)
       {
         Mfx_Event();
-
+        
         if(TouchEvent != 0)
         {
           BSP_TS_Get_GestureId(&TS_State);
-
+          
           while(BSP_LCD_IsFrameBufferAvailable() != LCD_OK);
           BSP_LCD_SetBackColor(LCD_COLOR_WHITE);
           BSP_LCD_SetTextColor(LCD_COLOR_BLUE);

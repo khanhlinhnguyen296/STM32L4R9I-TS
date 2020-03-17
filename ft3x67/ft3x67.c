@@ -37,10 +37,11 @@
 /* Includes ------------------------------------------------------------------*/
 #include <string.h>
 #include "ft3x67.h"
+//#include "system_stm32l4xx.h"
 #include "stm32l4xx_hal.h"
 #include "stm32l4r9xx.h"
+//#include "stm32l4xx_hal_i2c.h"
 #include "stm32l4r9i_discovery.h"
-#include "stm32l4r9i_discovery_io.h"
 
 /** @addtogroup BSP
   * @{
@@ -217,20 +218,17 @@ static void raydium_hw_reset(void);
   */
 void ft3x67_Init(uint16_t DeviceAddr)
 {
-	  GPIO_InitTypeDef gpio_init_structure;
-//  __HAL_RCC_GPIOB_CLK_ENABLE();
-	  TS_RES_GPIO_CLK_ENABLE();
+  GPIO_InitTypeDef gpio_init_structure;
+
+  TS_RES_GPIO_CLK_ENABLE();
   TS_INT_GPIO_CLK_ENABLE();
 
   // Config Reset pin
-//  BSP_IO_Init();
-//  BSP_IO_ConfigPin(TS_RES_PIN, IO_MODE_OUTPUT);
-
-    gpio_init_structure.Pin = GPIO_PIN_13;
-    gpio_init_structure.Pull = GPIO_PULLUP;
-    gpio_init_structure.Speed = GPIO_SPEED_FAST;
-    gpio_init_structure.Mode = GPIO_MODE_OUTPUT_PP;
-    HAL_GPIO_Init(GPIOB, &gpio_init_structure);
+ 	  gpio_init_structure.Pin = TS_RES_PIN;
+ 	  gpio_init_structure.Pull = GPIO_PULLUP;
+ 	  gpio_init_structure.Speed = GPIO_SPEED_FAST;
+ 	  gpio_init_structure.Mode = GPIO_MODE_OUTPUT_PP;
+ 	  HAL_GPIO_Init(TS_RES_GPIO_PORT, &gpio_init_structure);
 
   // Reset the touch sensor
   raydium_hw_reset();
@@ -349,13 +347,6 @@ uint8_t ft3x67_TS_DetectTouch(uint16_t DeviceAddr)
   // Reset current active touch index on which to work on
   ft3x67_handle.currActiveTouchIdx = 0U;
 
-  if(nbTouch[POS_PT_AMOUNT] == 0)
-  {
-    // clear touch seq num
-    uint8_t w_data = 0;
-    raydium_pda2_write(RAYDIUM_PDA2_TCH_RPT_STATUS_ADDR, &w_data, 1);
-  }
-
   return(nbTouch[POS_PT_AMOUNT]);
 }
 
@@ -403,7 +394,6 @@ void ft3x67_TS_GetXY(uint16_t DeviceAddr, uint16_t *X, uint16_t *Y)
   //}
 
   uint8_t data_index = 0;
-  uint8_t w_data = 0;
   uint8_t regAddress = RAYDIUM_PDA2_TCH_RPT_ADDR;
 
   static uint8_t dataxy[LENGTH_PT * MAX_TOUCH_NUM]; // May be the raydium IC packed all touch point data in a page
@@ -426,10 +416,7 @@ void ft3x67_TS_GetXY(uint16_t DeviceAddr, uint16_t *X, uint16_t *Y)
     case 0U :
       data_index = 0;
       raydium_pda2_read(regAddress, dataxy, LENGTH_PT * ft3x67_handle.currActiveTouchNb);
-
-      // clear touch seq num
-      raydium_pda2_write(RAYDIUM_PDA2_TCH_RPT_STATUS_ADDR, &w_data, 1);
-
+      raydium_pda2_set_page(RAYDIUM_PDA2_PAGE_0);
       break;
 
     case 1U :
@@ -460,18 +447,16 @@ void ft3x67_TS_EnableIT(uint16_t DeviceAddr)
 {
   /* Set interrupt trigger mode in FT3X67_GMODE_REG */
   //TS_IO_Write(DeviceAddr, FT3X67_GMODE_REG, FT3X67_G_MODE_INTERRUPT_TRIGGER);
-//	 BSP_IO_Init();
-	GPIO_InitTypeDef gpio_init_structure;
+  GPIO_InitTypeDef gpio_init_structure;
+
   /* Configure Interrupt mode for TS detection pin */
-  gpio_init_structure.Pin = TS_INT_PIN;
-  gpio_init_structure.Pull = GPIO_PULLUP;
-  gpio_init_structure.Speed = GPIO_SPEED_HIGH;
-  gpio_init_structure.Mode = GPIO_MODE_IT_FALLING;
-  HAL_GPIO_Init(TS_INT_GPIO_PORT, &gpio_init_structure);
-//  BSP_IO_ConfigPin(TS_INT_PIN, IO_MODE_IT_FALLING_EDGE_PU);
 
+ 	  gpio_init_structure.Pin = TS_INT_PIN;
+ 	  gpio_init_structure.Pull = GPIO_PULLUP;
+ 	  gpio_init_structure.Speed = GPIO_SPEED_FAST;
+ 	  gpio_init_structure.Mode = GPIO_MODE_IT_FALLING;
+ 	  HAL_GPIO_Init(TS_INT_GPIO_PORT, &gpio_init_structure);
 }
-
 /**
   * @brief  Configure the FT3X67 device to stop generating IT on the given INT pin
   *         connected to MCU as EXTI.
@@ -490,7 +475,6 @@ void ft3x67_TS_DisableIT(uint16_t DeviceAddr)
   gpio_init_structure.Speed = GPIO_SPEED_HIGH;
   gpio_init_structure.Mode = GPIO_MODE_INPUT;
   HAL_GPIO_Init(TS_INT_GPIO_PORT, &gpio_init_structure);
-//  BSP_IO_ConfigPin(TS_INT_PIN, IO_MODE_INPUT);
 }
 
 /**
@@ -714,7 +698,6 @@ static uint32_t ft3x67_TS_Configure(uint16_t DeviceAddr)
   //ft3x67_TS_GestureConfig(0, RAYDIUM_GESTURE_ENABLE);
 
   raydium_pda2_set_page(RAYDIUM_PDA2_PAGE_0);
-
   w_data[0] = 0x30;
   raydium_pda2_write(0x02, &w_data[0], 1);
 
@@ -809,14 +792,12 @@ static void raydium_pda_write(uint32_t addr, uint8_t *w_data, uint16_t length)
 
 static void raydium_hw_reset(void)
 {
-	 HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
-	  HAL_Delay(10);
-	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_SET);
-	  HAL_Delay(400);
-//BSP_IO_WritePin(TS_RES_PIN, GPIO_PIN_RESET);
-//  HAL_Delay(10);
-//  BSP_IO_WritePin(TS_RES_PIN, GPIO_PIN_SET);
-//  HAL_Delay(400);
+  HAL_GPIO_WritePin(TS_RES_GPIO_PORT, TS_RES_PIN, GPIO_PIN_SET);
+  delay_us(1000);
+  HAL_GPIO_WritePin(TS_RES_GPIO_PORT, TS_RES_PIN, GPIO_PIN_RESET);
+  delay_us(15000);
+  HAL_GPIO_WritePin(TS_RES_GPIO_PORT, TS_RES_PIN, GPIO_PIN_SET);
+  delay_us(80000);
 }
 
 static void raydium_pda2_set_page(uint8_t page)

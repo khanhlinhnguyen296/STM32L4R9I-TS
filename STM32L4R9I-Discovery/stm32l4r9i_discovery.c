@@ -44,7 +44,7 @@
    */
 #define __STM32L4R9I_DISCOVERY_BSP_VERSION_MAIN   (0x01) /*!< [31:24] main version */
 #define __STM32L4R9I_DISCOVERY_BSP_VERSION_SUB1   (0x00) /*!< [23:16] sub1 version */
-#define __STM32L4R9I_DISCOVERY_BSP_VERSION_SUB2   (0x03) /*!< [15:8]  sub2 version */
+#define __STM32L4R9I_DISCOVERY_BSP_VERSION_SUB2   (0x02) /*!< [15:8]  sub2 version */
 #define __STM32L4R9I_DISCOVERY_BSP_VERSION_RC     (0x00) /*!< [7:0]  release candidate */
 #define __STM32L4R9I_DISCOVERY_BSP_VERSION            ((__STM32L4R9I_DISCOVERY_BSP_VERSION_MAIN << 24)\
                                                       |(__STM32L4R9I_DISCOVERY_BSP_VERSION_SUB1 << 16)\
@@ -146,7 +146,7 @@ void            TS_IO_Init(void);
 void            TS_IO_Write(uint8_t Addr, uint8_t Reg, uint8_t Value);
 uint8_t         TS_IO_Read(uint8_t Addr, uint8_t Reg);
 uint16_t        TS_IO_ReadMultiple(uint8_t Addr, uint8_t Reg, uint8_t *Buffer, uint16_t Length);
-void            TS_IO_WriteMultiple(uint8_t Addr, uint8_t Reg, uint8_t *Buffer, uint16_t Length);
+uint16_t        TS_IO_WriteMultiple(uint8_t Addr, uint8_t Reg, uint8_t *Buffer, uint16_t Length);
 void            TS_IO_Delay(uint32_t Delay);
 
 /* CAMERA IO functions */
@@ -1248,7 +1248,7 @@ uint16_t TS_IO_ReadMultiple(uint8_t Addr, uint8_t Reg, uint8_t *Buffer, uint16_t
   * @param  Length: Length of the data
   * @retval None
   */
-void TS_IO_WriteMultiple(uint8_t Addr, uint8_t Reg, uint8_t *Buffer, uint16_t Length)
+uint16_t TS_IO_WriteMultiple(uint8_t Addr, uint8_t Reg, uint8_t *Buffer, uint16_t Length)
 {
   I2C1_WriteMultiple(Addr, (uint16_t)Reg, I2C_MEMADD_SIZE_8BIT, Buffer, Length);
 }
