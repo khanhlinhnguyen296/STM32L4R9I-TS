@@ -234,6 +234,7 @@ extern void     TS_IO_Init(void);
 extern void     TS_IO_Write(uint8_t Addr, uint8_t Reg, uint8_t Value);
 extern uint8_t  TS_IO_Read(uint8_t Addr, uint8_t Reg);
 extern uint16_t TS_IO_ReadMultiple(uint8_t Addr, uint8_t Reg, uint8_t *Buffer, uint16_t Length);
+extern uint16_t TS_IO_WriteMultiple(uint8_t Addr, uint8_t Reg, uint8_t *Buffer, uint16_t Length);
 extern void     TS_IO_Delay(uint32_t Delay);
 
 /**
